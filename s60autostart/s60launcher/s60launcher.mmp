@@ -1,0 +1,29 @@
+
+TARGET          as_s60launcher.exe
+TARGETTYPE      exe
+UID             0x00000000 0xEA84EAEA
+
+VENDORID    	  0
+CAPABILITY 		  None
+
+EPOCSTACKSIZE	  0x5000
+
+#ifdef SYMBIAN_ENABLE_SPLIT_HEADERS
+MACRO          SYMBIAN_ENABLE_PUBLIC_PLATFORM_HEADER_SPLIT
+#endif
+
+USERINCLUDE     .
+USERINCLUDE     ..
+
+SYSTEMINCLUDE   . \epoc32\include \epoc32\include\platform
+
+SOURCEPATH      .
+SOURCE          s60launcher.cpp
+SOURCE          singleshottimer.cpp
+
+LIBRARY         euser.lib
+LIBRARY         efsrv.lib
+LIBRARY         bafl.lib
+LIBRARY         flogger.lib
+
+// End of File

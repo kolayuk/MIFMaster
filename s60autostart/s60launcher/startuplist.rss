@@ -1,0 +1,7 @@
+#include <startupitem.rh>
+
+RESOURCE STARTUP_ITEM_INFO autostarter
+{
+executable_name = "c:\\sys\\bin\\as_MIFMaster.exe";
+recovery = EStartupItemExPolicyNone;
+}

@@ -1,0 +1,135 @@
+-------------------------------------------------------------------------------
+
+S60AutoStart v1.6
+
+User-selectable autostart for Qt apps on Symbian/S60 devices
+
+-------------------------------------------------------------------------------
+
+This project will enable Qt for Symbian applications to be started 
+automatically during a device bootup process.
+
+-------------------------------------------------------------------------------
+
+USAGE:
+
+- Extract the zip into your Qt project folder (that contains your .pro file)
+
+- Add following line to the end of your .pro file:
+
+include(s60autostart/s60autostart.pri)
+
+- Define following variables in your .pro file:
+
+  TARGET.UID3
+    - Specifies unique ID to use for the target symbian application
+    - See qmake variable reference for more information
+    
+  s60launcher.UID3
+    - Specifies unique ID to use for the native launcher application
+    - Same format as TARGET.UID3, value must be different
+    
+(Optional):
+
+  CONFIG += enable-autostart
+    - If defined, autostart is enabled by default after installation
+
+- Finally, rerun qmake, then build normally
+
+-------------------------------------------------------------------------------
+
+NOTES:
+
+After a successful build, the sis file needs to be signed against a trusted
+certificate, as required by the s60 startup list manager. Autostart 
+application cannot be installed using a self-signed sis package.
+
+-------------------------------------------------------------------------------
+
+IMPLEMENTATION DETAILS
+
+S60AutoStart uses a native Symbian executable that's included in the main 
+application sis file and added to the startup list. This executable checks
+for the presence of c:\system\data\<AppName>.ini file, and launches the main
+application if it exists.
+
+It's easy to provide a setup UI for turning autostart on/off in the main
+application using the provided helper functions:
+
+#ifdef Q_OS_SYMBIAN
+
+#include "s60autostart.h"
+
+bool autostart = S60AutoStart::IsAutoStartEnabled();
+
+// toggle autostart
+S60AutoStart::SetAutoStart( !autostart );
+
+#endif // Q_OS_SYMBIAN
+
+The launcher passes a command line parameter to the application. This makes it 
+possible to determine whether the application was launched automatically or by
+the user. Parse the command line arguments in main() for "autostart" string
+(without quotes), or simply check if argc > 1.
+
+
+Qt Quick Support
+
+Autostart settings are also available for QML. In the source file that contains
+the main() entrypoint, include qtquick-autostart.h and call qmlInitAutoStart():
+
+#include "qtquick-autostart.h"
+
+int main(int argc, char *argv[])
+{
+		QApplication app(argc, argv);
+		qmlInitAutoStart();
+		...
+		
+qmlInitAutoStart() function (or a macro, actually) must be called before 
+attempting to load any .qml files. It will register a new element called
+AutoStart, available by importing com.nokia.autostart.symbian:
+
+import QtQuick 1.1
+import com.nokia.autostart.symbian 1.0
+
+...
+
+AutoStart { id: autostart }
+
+After this, autostart.enabled (bool) is initialized with the current 
+autostart setting and can be turned on/off.
+
+autostart.launchType is a read-only string containing one of two values:
+
+"normal"	- Application was launched by the user
+"auto"		- Application was launched automatically
+
+-------------------------------------------------------------------------------
+
+RELEASE HISTORY
+
+1.6 Added support for Qt Quick applications
+
+1.5 Bugfix with DEPLOYMENT.display_name causing autostart to fail.
+    Introduced a new CONFIG option 'enable-autostart'
+
+1.4 Added experimental support for sbsv2 (Raptor) builds
+
+1.3 Added a command line argument "autostart" for autostarted apps
+
+1.2 Using a custom Makefile to build s60launcher instead of a batch file
+    Simplified s60autostart.pri, removed autostartdefs.pri
+    Added project cleanup support for s60launcher
+
+1.1 Minor bug fixes for the native launcher
+
+1.0 Initial release
+
+-------------------------------------------------------------------------------
+
+S60AutoStart in Forum Nokia wiki:
+
+http://wiki.forum.nokia.com/index.php/Implementing_user-selectable_autostart_feature_in_Qt_for_Symbian
+
+---------------------------------------------------------------------------eof-
