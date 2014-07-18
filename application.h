@@ -40,6 +40,7 @@ public:
     static void removePatchAndPreparedMIFs();
     static TReason getAutoStartReason();
     static S60Version getS60Version();
+    static void killProcess(QString uid);
 signals:
     
 public slots:

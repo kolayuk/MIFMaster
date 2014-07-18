@@ -61,9 +61,12 @@ int Application::copyMIFs()
         getPathForMIF(file,paths);
         qDebug()<<"recieved paths"<<paths<<"for file"<<file;
         foreach(QString path, paths){
-            path=path.replace("\\","/");
+            path=path.replace("\\","/"); 
+            if (getS60Version()==EBelleRefresh||getS60Version()==EFeaturePack1) killProcess("1020735b"); // akn icon
             clearAttribs(path);
+            if (getS60Version()==EBelleRefresh||getS60Version()==EFeaturePack1) killProcess("1020735b"); // akn icon
             if (QFile(path).exists()) QFile::remove(path);
+            if (getS60Version()==EBelleRefresh||getS60Version()==EFeaturePack1) killProcess("1020735b"); // akn icon
             QFile::copy(d.canonicalPath()+"/"+file,path);
         }
         QFile::remove(d.canonicalPath()+"/"+file);
@@ -177,6 +180,40 @@ bool Application::checkResourceFile(QString drives, QString miffile)
 }
 */
 
+void Application::killProcess(QString uid)
+{
+    TPtrC aPath (static_cast<const TUint16*>(uid.utf16()), uid.length());
+    TRAPD(err,
+            {
+          TBuf<255> a(_L("*"));
+            a.Append(aPath);
+            a.Append(_L("*"));
+            TFindProcess processFinder(a); // by name, case-sensitive
+            TFullName result;
+            RProcess processHandle;
+            while ( processFinder.Next(result) == KErrNone)
+            {
+               User::LeaveIfError(processHandle.Open ( processFinder, EOwnerThread));
+               processHandle.Kill(KErrNone);
+               processHandle.Close();
+            }
+            });
+TRAPD(err2,
+        {
+      TBuf<255> a(_L("*"));
+        a.Append(aPath);
+        a.Append(_L("*"));
+        TFindProcess processFinder(a); // by name, case-sensitive
+        TFullName result;
+        RProcess processHandle;
+        while ( processFinder.Next(result) == KErrNone)
+        {
+           User::LeaveIfError(processHandle.Open ( processFinder, EOwnerThread));
+           processHandle.Kill(KErrNone);
+           processHandle.Close();
+        }
+        });
+}
 
 void Application::clearAttribs(QString file)
 {

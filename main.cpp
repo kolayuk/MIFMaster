@@ -105,9 +105,18 @@ int main(int argc, char *argv[])
             }
             if (Application::confNote((Application::tr("Install MIF-files? Device will reboot multiple times."))))
             {
-                Application::renameAknIcon(false);
-                Application::setAutoStartReason(EInstallingMifs);
-                Application::reset();
+                if (Application::getS60Version()==EBelleRefresh||
+                    Application::getS60Version()==EFeaturePack1){
+                    // one reboot way for refresh/FP1 devices
+                    Application::copyMIFs(); // and kill aknicon on copying
+                    Application::setAutoStartReason(EAllDone);
+                    Application::reset();
+                }
+                else{
+                    Application::renameAknIcon(false);
+                    Application::setAutoStartReason(EInstallingMifs);
+                    Application::reset();
+                }
             }
         }
     }
