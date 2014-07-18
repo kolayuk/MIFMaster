@@ -28,6 +28,8 @@ public:
     static void switchCache();
     static void prepareMIFsForPatch(QString drive);
     static void reset();
+    static void getPathForMIF(QString name,QStringList& paths);
+    //static bool checkResourceFile(QString drives, QString miffile);
     static void clearAttribs(QString file);
     static void note(QString text);
     static bool confNote(QString text);

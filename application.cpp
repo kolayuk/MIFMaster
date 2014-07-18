@@ -54,14 +54,19 @@ bool Application::isAknIconRenamed()
 int Application::copyMIFs()
 {
     QDir d("E:/");
-    QString target=QString("E:/resource/apps/");
     QStringList mifs=d.entryList(QStringList(QString("*.mif")));
+    QStringList paths;
     foreach(QString file, mifs){
-        clearAttribs(target+file);
-        if (QFile(target+file).exists()) QFile::remove(target+file);
-        QFile::copy(d.canonicalPath()+"/"+file,target+file);
+        paths.clear();
+        getPathForMIF(file,paths);
+        qDebug()<<"recieved paths"<<paths<<"for file"<<file;
+        foreach(QString path, paths){
+            path=path.replace("\\","/");
+            clearAttribs(path);
+            if (QFile(path).exists()) QFile::remove(path);
+            QFile::copy(d.canonicalPath()+"/"+file,path);
+        }
         QFile::remove(d.canonicalPath()+"/"+file);
-
     }
     return mifs.count();
 }
@@ -106,6 +111,72 @@ void Application::reset()
         starter.Reset(starter.ELanguageSwitchReset);
         starter.Close();
 }
+
+
+void Application::getPathForMIF(QString name,QStringList& paths)
+{
+    /*
+    if (checkResourceFile("Z,E", name)) return "E";
+    else if (checkResourceFile("Z,C,E", name)) return "C,E";
+    else if (checkResourceFile("Z,C", name)) return "C,E";
+    else if (checkResourceFile("C,E", name)) return "C";
+    else if (checkResourceFile("E", name)) return "E";
+    else if (checkResourceFile("F", name)) return "F";
+    else {qDebug()<<"Invalid state"<<name; return "C,E";}
+    */
+    name=name.toLower();
+    QFile file(QDir::currentPath()+"/rules.txt");
+    if (!file.open (QFile::ReadOnly)) {
+        qDebug()<<"failed to open file with rules";
+        return;
+    }
+
+    QTextStream stream ( &file );
+    stream.setCodec("UTF-8");
+    QString line;
+    QString drives, path;
+    bool found=false;
+    while( !stream.atEnd())
+    {
+         line = stream.readLine();
+         line=line.replace("\r","").replace("\n","");
+         if (!line.contains(":")||(!line.contains(name))) {continue;}
+         qDebug()<<name<<"found in file";
+         drives=line.split(":").at(0);
+         path=line.split(":")[1];
+         found=true;
+         foreach(QString drive, drives.split(",")){
+             if (drive.contains("!")){
+                 qDebug()<<"standalone widget";
+                 foreach(QString chkDrive, QString("F,C,E").split(",")){
+                     qDebug()<<"check"<<chkDrive<<QFile::exists(chkDrive+":"+path);
+                     if (QFile::exists(chkDrive+":"+path))
+                     {
+                         qDebug()<<"found at"<<chkDrive;
+                         paths.append(chkDrive+":"+path);
+                     }
+                 }
+             }
+             else{
+                 paths.append(drive+":"+path);
+             }
+         }
+    }
+    file.close(); // when your done.
+    if (!found) {qDebug()<<name<<"not found - default"; paths.append("E:/resource/apps/"+name);}
+}
+/*
+bool Application::checkResourceFile(QString drives, QString miffile)
+{
+    bool z=QFile::exists("Z:/resource/apps/"+miffile)==drives.contains("Z");
+    bool c=QFile::exists("C:/resource/apps/"+miffile)==drives.contains("C");
+    bool f=QFile::exists("F:/resource/apps/"+miffile)==drives.contains("F");
+    bool e=QFile::exists("E:/resource/apps/"+miffile)==drives.contains("E");
+    qDebug()<<miffile<<drives<<"C"<<c<<"E"<<e<<"F"<<f<<"Z"<<z;
+    return (z==c==f==e);
+}
+*/
+
 
 void Application::clearAttribs(QString file)
 {
@@ -200,16 +271,13 @@ void Application::setAutoStartReason(TReason reason)
 
 bool Application::isUninstalling()
 {
-    qDebug()<<"is uninstalling";
     RWsSession* ws=new RWsSession();
     ws->Connect();
     TApaTaskList tlist(*ws);
     TApaTask t=tlist.FindApp(TUid::Uid(0x101f875a));
     bool ex=t.Exists();
     ws->Close();
-    qDebug()<<1;
     delete ws;
-    qDebug()<<2;
     return ex;
 }
 

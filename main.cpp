@@ -3,15 +3,53 @@
 #include <s60autostart/s60autostart.h>
 #include <QDebug>
 #include <QTranslator>
+#include <QTime>
+#include <QFile>
+
+void myMessageHandler(QtMsgType type, const char *msg)
+{
+        QString txt;
+        QTime t=QTime::currentTime();
+        QString st=t.toString("hh:mm:ss");
+        switch (type) {
+        case QtDebugMsg:
+                txt = QString(" %1").arg(msg);
+                break;
+        case QtWarningMsg:
+                txt = QString(" Warning: %1").arg(msg);
+        break;
+        case QtCriticalMsg:
+                txt = QString(" Critical: %1").arg(msg);
+        break;
+        case QtFatalMsg:
+                txt = QString(" Fatal: %1").arg(msg);
+                abort();
+        }
+        txt=st+txt;
+        QFile outFile("C:\\mifmaster.txt");
+        outFile.open(QIODevice::WriteOnly | QIODevice::Append);
+        QTextStream ts(&outFile);
+        ts << txt << endl;
+#ifdef Q_OS_SYMBIAN
+        TPtrC des (reinterpret_cast<const TText*>(txt.constData()),txt.length());
+        RDebug::Print(des);
+#endif
+}
+
 
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
+    qDebug()<<"launch";
+    QFile file("D:\\mifmaster.txt");
+    //if (file.exists()){file.remove();}
+    qInstallMsgHandler(myMessageHandler);
     S60AutoStart::SetAutoStart(ETrue);
     QTranslator myTranslator;
       myTranslator.load("mifmaster_" + QLocale::system().name());
       a.installTranslator(&myTranslator);
     bool wasAutostart= argc > 1;
+    qDebug()<<"autostart"<<wasAutostart;
     if (wasAutostart)  User::After(5000000);
     if (wasAutostart&&Application::getAutoStartReason()==EUndefined) return 0;
 
@@ -19,10 +57,12 @@ int main(int argc, char *argv[])
         if (!Application::confNote((Application::tr("Open4All patch is not activated (it is recomended apply it to autostart), MIF files can not be installed without patch. Continue?")))) return 0;
     }
     if (Application::isUninstalling()&&Application::isPatchInstalled()){
-        Application::renameAknIcon(false);
-        Application::setAutoStartReason(EUninstallingApp);
-        Application::note((Application::tr("You're deleting MIFMaster, device will be reboot to remove mif-replacement patch...")));
-        Application::reset();
+        if (Application::confNote((Application::tr("You're deleting MIFMaster, device will be reboot to remove mif-replacement patch..."))))
+        {
+            Application::renameAknIcon(false);
+            Application::setAutoStartReason(EUninstallingApp);
+            Application::reset();
+        }
     }
     qDebug()<<"main";
     if (wasAutostart&&Application::getAutoStartReason()==EUninstallingApp){

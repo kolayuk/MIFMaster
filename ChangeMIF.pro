@@ -33,24 +33,28 @@ symbian:DEPLOYMENT += vendor
 MMP_RULES-="DEBUGGABLE_UDEBONLY"
 MMP_RULES+="DEBUGGABLE"
 
-folder_01.sources = $$files($$PWD/patches/*.dll1)
-folder_01.path = patches
-DEPLOYMENT += folder_01
+patches.sources = $$files($$PWD/patches/*.dll1)
+patches.path = patches
+DEPLOYMENT += patches
 
-folder_02.sources = $$PWD/mifmaster_*.qm
-folder_02.path =
-DEPLOYMENT += folder_02
+locs.sources = $$PWD/mifmaster_*.qm
+locs.path =
+DEPLOYMENT += locs
 
 symbian: {
   TARGET.UID3 = 0xEA84EADA
   s60launcher.UID3 =  0xEA84EAEA
   }
 
+rules.sources = $$PWD/rules.txt
+rules.path =
+DEPLOYMENT += rules
+
 lang =  "&EN,RU"
 lang1.pkg_prerules = lang
 symbian:DEPLOYMENT += lang1
 
-packageheader = "$${LITERAL_HASH}{\"MIFMaster\",\"MIFMaster\"}, (0xEA84EADA), 1, 0, 0, TYPE=SA"
+packageheader = "$${LITERAL_HASH}{\"MIFMaster\",\"MIFMaster\"}, (0xEA84EADA), 1, 1, 0, TYPE=SA"
 info.pkg_prerules=packageheader
 symbian:DEPLOYMENT+=info
 
