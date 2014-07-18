@@ -6,16 +6,6 @@
 #include <QTime>
 #include <QFile>
 
-const QString INSTALL_REBOOT_MULTIPLE=Application::tr("Install MIF-files? Device will reboot multiple times.");
-const QString OPEN4ALL_NOT_ACTIVE=Application::tr("Open4All patch is not activated (it is recomended apply it to autostart), MIF files can not be installed without patch. Continue?");
-const QString DELETE_MIFMASTER_CONF=Application::tr("You're deleting MIFMaster, remove mif replacement patch (device will reboot)?");
-const QString PATCH_DELETED=Application::tr("Patch deleted! Remove application one more time :)");
-const QString INSTALL_REBOOT_ONCE=Application::tr("Install MIF-files? Phone will reboot.");
-const QString NO_MIF_FOUND=Application::tr("No *.mif files found!");
-const QString INSTALL_PATCH=Application::tr("MIF-files replacement patch is not installed, install it (reboot required)?");
-const QString ALL_DONE=Application::tr("All done!");
-const QString PATCH_INSTALLED=Application::tr("Patch installed! Copy MIF-files to E drive root folder and run an app");
-
 void myMessageHandler(QtMsgType type, const char *msg)
 {
         QString txt;
@@ -56,8 +46,20 @@ int main(int argc, char *argv[])
     qInstallMsgHandler(myMessageHandler);
     S60AutoStart::SetAutoStart(ETrue);
     QTranslator myTranslator;
-      myTranslator.load("mifmaster_" + QLocale::system().name());
-      a.installTranslator(&myTranslator);
+    myTranslator.load("mifmaster_" + QLocale::system().name());
+    a.installTranslator(&myTranslator);
+
+    const QString INSTALL_REBOOT_MULTIPLE=Application::tr("Install MIF-files? Device will reboot multiple times.");
+    const QString OPEN4ALL_NOT_ACTIVE=Application::tr("Open4All patch is not activated (it is recomended apply it to autostart), MIF files can not be installed without patch. Continue?");
+    const QString DELETE_MIFMASTER_CONF=Application::tr("You're deleting MIFMaster, remove mif replacement patch (device will reboot)?");
+    const QString PATCH_DELETED=Application::tr("Patch deleted! Remove application one more time :)");
+    const QString INSTALL_REBOOT_ONCE=Application::tr("Install MIF-files? Phone will reboot.");
+    const QString NO_MIF_FOUND=Application::tr("No *.mif files found!");
+    const QString INSTALL_PATCH=Application::tr("MIF-files replacement patch is not installed, install it (reboot required)?");
+    const QString ALL_DONE=Application::tr("All done!");
+    const QString PATCH_INSTALLED=Application::tr("Patch installed! Copy MIF-files to E drive root folder and run an app");
+
+
     bool wasAutostart= argc > 1;
     qDebug()<<"autostart"<<wasAutostart;
     if (wasAutostart)  User::After(5000000);
