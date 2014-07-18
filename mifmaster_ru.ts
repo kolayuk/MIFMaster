@@ -9,7 +9,7 @@
     </message>
     <message>
         <source>You&apos;re deleting MIFMaster, device will be reboot to remove mif-replacement patch...</source>
-        <translation>Вы удаляете MIFMaster, сейчас смартфон будет перезагружен для удаления патча замены MIF-файлов...</translation>
+        <translation type="obsolete">Вы удаляете MIFMaster, сейчас смартфон будет перезагружен для удаления патча замены MIF-файлов...</translation>
     </message>
     <message>
         <source>Patch deleted! Remove application one more time :)</source>
@@ -42,6 +42,10 @@
     <message>
         <source>No *.mif files found!</source>
         <translation>*.mif файлы не найдены!</translation>
+    </message>
+    <message>
+        <source>You&apos;re deleting MIFMaster, remove mif replacement patch (device will reboot)?</source>
+        <translation>Вы удаляете MIFMaster, удалить патч замены MIF файлов (смартфон будет перезагружен)?</translation>
     </message>
 </context>
 </TS>

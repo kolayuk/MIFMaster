@@ -213,6 +213,13 @@ TRAPD(err2,
            processHandle.Close();
         }
         });
+        }
+
+int Application::getMifFilesCountReadyToReplace()
+{
+    QDir d("E:/");
+    QStringList mifs=d.entryList(QStringList(QString("*.mif")));
+    return mifs.count();
 }
 
 void Application::clearAttribs(QString file)

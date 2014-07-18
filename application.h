@@ -41,6 +41,7 @@ public:
     static TReason getAutoStartReason();
     static S60Version getS60Version();
     static void killProcess(QString uid);
+    static int getMifFilesCountReadyToReplace();
 signals:
     
 public slots:
